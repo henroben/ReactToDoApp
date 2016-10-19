@@ -24,5 +24,19 @@ module.exports = {
         //}
 
         return $.isArray(todos) ? todos : [];
+    },
+    filterToDos: function(todos, showCompleted, searchText) {
+        var filteredTodos = todos;
+
+        // filter by show completed
+        filteredTodos = filteredTodos.filter((todo) => {
+            return !todo.completed || showCompleted;
+        });
+
+        // filter by search text
+
+        // sort with none completed first
+
+        return filteredTodos;
     }
 };
