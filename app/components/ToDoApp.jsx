@@ -1,29 +1,49 @@
 var React = require('react');
 var {Grid, Row, Col} = require('react-bootstrap');
+var uuid = require('node-uuid');
+
 var ToDoList = require('ToDoList');
+var AddToDo = require('AddToDo');
+var ToDoSearch = require('ToDoSearch');
+var ToDoAPI = require('ToDoAPI');
 
 var ToDoApp = React.createClass({
     getInitialState() {
         return {
+            showCompleted: false,
+            searchText: '',
+            todos: ToDoAPI.getToDos()
+        };
+    },
+    handleSearch: function(showCompleted, searchText) {
+        this.setState({
+            showCompleted: showCompleted,
+            searchText: searchText.toLowerCase(),
+        });
+    },
+    componentDidUpdate: function() {
+        ToDoAPI.setToDos(this.state.todos);
+    },
+    handleAddToDo: function(text) {
+        this.setState({
             todos: [
+                ...this.state.todos,
                 {
-                    id: 1,
-                    text: 'Feed the cat'
-                },
-                {
-                    id: 2,
-                    text: 'Walk the dog'
-                },
-                {
-                    id: 3,
-                    text: 'Sweep garden'
-                },
-                {
-                    id: 4,
-                    text: 'Learn React'
+                    id: uuid(),
+                    text: text,
+                    completed: false
                 }
             ]
-        };
+        });
+    },
+    handleToggle: function(id) {
+        var updatedTodos = this.state.todos.map((todo) => {
+            if(todo.id === id) {
+                todo.completed = !todo.completed;
+            }
+            return todo;
+        });
+        this.setState({todos: updatedTodos});
     },
     render: function() {
         var {todos} = this.state;
@@ -34,7 +54,9 @@ var ToDoApp = React.createClass({
                     <Row className="show-grid">
                         <Col md={3} xsHidden></Col>
                         <Col md={6}>
-                            <ToDoList todos={todos}/>
+                            <ToDoSearch onSearch={this.handleSearch}/>
+                            <ToDoList todos={todos} onToggle={this.handleToggle}/>
+                            <AddToDo onAddToDo={this.handleAddToDo}/>
                         </Col>
                         <Col md={3} xsHidden></Col>
                     </Row>
